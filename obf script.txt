@@ -1,79 +1,111 @@
--- Percsploit Multi Loader (Universal Animated Version)
-local Players = game:GetService("Players")
+-- Percsploit Multi Loader
 local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 
--- Detect if player is on mobile
+-- Detect if the user is on mobile
 local isMobile = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
 
--- GUI Setup
+-- Create ScreenGui
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "PercsploitMultiLoader"
+ScreenGui.Parent = PlayerGui
 ScreenGui.IgnoreGuiInset = true
 ScreenGui.ResetOnSpawn = false
-ScreenGui.Parent = PlayerGui
 
--- Main Frame
+-- Startup Animation (Purple Star)
+local StartupFrame = Instance.new("Frame")
+StartupFrame.Size = UDim2.new(1, 0, 1, 0)
+StartupFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+StartupFrame.BackgroundTransparency = 0
+StartupFrame.Parent = ScreenGui
+StartupFrame.ZIndex = 10
+
+local StarImage = Instance.new("ImageLabel")
+StarImage.Size = UDim2.new(0, 100, 0, 100)
+StarImage.Position = UDim2.new(0.5, -50, 0.5, -50)
+StarImage.BackgroundTransparency = 1
+StarImage.Image = "rbxassetid://7051121336" -- Roblox default star icon (purple-tinted)
+StarImage.ImageColor3 = Color3.fromRGB(128, 0, 128) -- Purple tint
+StarImage.Parent = StartupFrame
+
+-- Main GUI (created early but invisible)
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 320, 0, 420)
-MainFrame.Position = UDim2.new(0.5, -160, 0.5, -210)
-MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+MainFrame.Size = UDim2.new(0, 0, 0, 0)
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
+MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 MainFrame.BorderSizePixel = 0
-MainFrame.Visible = true
-MainFrame.Active = true
-MainFrame.Draggable = true
+MainFrame.Visible = false
 MainFrame.Parent = ScreenGui
 
-local UICorner = Instance.new("UICorner", MainFrame)
-UICorner.CornerRadius = UDim.new(0, 12)
+-- Glossy effect with UICorner and UIGradient
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 10)
+UICorner.Parent = MainFrame
 
--- Glow effect (simulated with gradient loop)
-local Glow = Instance.new("UIGradient", MainFrame)
-Glow.Color = ColorSequence.new(
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(120, 0, 255)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 0, 150))
-)
-Glow.Rotation = 45
-
-RunService.RenderStepped:Connect(function()
-    Glow.Rotation = Glow.Rotation + 0.5
-end)
+local UIGradient = Instance.new("UIGradient")
+UIGradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(128, 0, 128)), -- Purple
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 105, 180)) -- Pink
+}
+UIGradient.Parent = MainFrame
 
 -- Title
-local Title = Instance.new("TextLabel", MainFrame)
-Title.Size = UDim2.new(1, 0, 0, 45)
-Title.BackgroundTransparency = 1
-Title.Text = "Percsploit Multi Loader"
-Title.Font = Enum.Font.GothamBold
-Title.TextSize = 24
-Title.TextColor3 = Color3.fromRGB(190, 0, 255)
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Size = UDim2.new(1, 0, 0, 50)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "Percsploit Multi Loader"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.TextSize = 24
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.TextStrokeTransparency = 0.8
+TitleLabel.TextStrokeColor3 = Color3.fromRGB(128, 0, 128)
+TitleLabel.Parent = MainFrame
+
+-- Minimize Button (for mobile)
+local MinimizeButton
+if isMobile then
+    MinimizeButton = Instance.new("TextButton")
+    MinimizeButton.Size = UDim2.new(0, 40, 0, 40)
+    MinimizeButton.Position = UDim2.new(0, 5, 0, 5)
+    MinimizeButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    MinimizeButton.Text = "-"
+    MinimizeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    MinimizeButton.TextSize = 20
+    MinimizeButton.Font = Enum.Font.GothamBold
+    MinimizeButton.Parent = MainFrame
+    local MinCorner = Instance.new("UICorner")
+    MinCorner.CornerRadius = UDim.new(0, 5)
+    MinCorner.Parent = MinimizeButton
+end
 
 -- Key Input
-local KeyInput = Instance.new("TextBox", MainFrame)
+local KeyInput = Instance.new("TextBox")
 KeyInput.Size = UDim2.new(0.9, 0, 0, 40)
 KeyInput.Position = UDim2.new(0.05, 0, 0, 60)
-KeyInput.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+KeyInput.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 KeyInput.Text = "Enter your key here"
-KeyInput.TextColor3 = Color3.fromRGB(220, 220, 220)
-KeyInput.Font = Enum.Font.Gotham
+KeyInput.TextColor3 = Color3.fromRGB(200, 200, 200)
 KeyInput.TextSize = 16
-local KeyCorner = Instance.new("UICorner", KeyInput)
-KeyCorner.CornerRadius = UDim.new(0, 6)
+KeyInput.Font = Enum.Font.Gotham
+KeyInput.Parent = MainFrame
+local KeyCorner = Instance.new("UICorner")
+KeyCorner.CornerRadius = UDim.new(0, 5)
+KeyCorner.Parent = KeyInput
 
--- Script Scroll
-local Scroll = Instance.new("ScrollingFrame", MainFrame)
-Scroll.Size = UDim2.new(0.9, 0, 0, 300)
-Scroll.Position = UDim2.new(0.05, 0, 0, 110)
-Scroll.BackgroundTransparency = 1
-Scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-Scroll.ScrollBarThickness = 6
-Scroll.ScrollBarImageColor3 = Color3.fromRGB(140, 0, 255)
-local UIList = Instance.new("UIListLayout", Scroll)
-UIList.Padding = UDim.new(0, 10)
+-- Scrolling Frame for Scripts
+local ScrollFrame = Instance.new("ScrollingFrame")
+ScrollFrame.Size = UDim2.new(0.9, 0, 0, 270)
+ScrollFrame.Position = UDim2.new(0.05, 0, 0, 110)
+ScrollFrame.BackgroundTransparency = 1
+ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+ScrollFrame.ScrollBarThickness = 5
+ScrollFrame.ScrollBarImageColor3 = Color3.fromRGB(128, 0, 128)
+ScrollFrame.Parent = MainFrame
 
--- Script List
+-- Scripts table
 local scripts = {
     {name = "Arcade Basketball", url = "https://api.luarmor.net/files/v3/loaders/4b9b7b3daa96e24fb09b4451abe2fd50.lua"},
     {name = "Hoop Heroes", url = "https://api.luarmor.net/files/v3/loaders/12d8d6a43ade4627ec3bdfe242435a82.lua"},
@@ -82,96 +114,200 @@ local scripts = {
     {name = "Playground Basketball", url = "https://api.luarmor.net/files/v3/loaders/1f7d065fdc92ad0c0b92994a16c1b97f.lua"}
 }
 
-for _, info in ipairs(scripts) do
-    local Btn = Instance.new("TextButton")
-    Btn.Size = UDim2.new(1, 0, 0, 40)
-    Btn.BackgroundColor3 = Color3.fromRGB(40, 0, 70)
-    Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Btn.Text = info.name
-    Btn.Font = Enum.Font.Gotham
-    Btn.TextSize = 16
-    Btn.Parent = Scroll
+-- Create buttons for each script
+local buttonHeight = 50
+local buttonSpacing = 10
+local layout = Instance.new("UIListLayout")
+layout.Padding = UDim.new(0, buttonSpacing)
+layout.Parent = ScrollFrame
 
-    local Corner = Instance.new("UICorner", Btn)
-    Corner.CornerRadius = UDim.new(0, 8)
+for i, script in ipairs(scripts) do
+    local ButtonFrame = Instance.new("Frame")
+    ButtonFrame.Size = UDim2.new(1, 0, 0, buttonHeight)
+    ButtonFrame.BackgroundTransparency = 1
+    ButtonFrame.Parent = ScrollFrame
 
-    -- Glow Animation (Pulse)
-    task.spawn(function()
-        local direction = 1
-        while Btn.Parent do
-            local r = Btn.BackgroundColor3.R * 255
-            local g = Btn.BackgroundColor3.G * 255
-            local b = Btn.BackgroundColor3.B * 255
-            Btn.BackgroundColor3 = Color3.fromRGB(r + 0.1 * direction, g, b + 0.2 * direction)
-            task.wait(0.05)
-            if Btn.BackgroundColor3.B > 0.8 or Btn.BackgroundColor3.B < 0.5 then
-                direction = -direction
-            end
-        end
-    end)
+    local Button = Instance.new("TextButton")
+    Button.Size = UDim2.new(1, 0, 0, 40)
+    Button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    Button.Text = script.name
+    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Button.TextSize = 16
+    Button.Font = Enum.Font.Gotham
+    Button.Parent = ButtonFrame
+    local BtnCorner = Instance.new("UICorner")
+    BtnCorner.CornerRadius = UDim.new(0, 5)
+    BtnCorner.Parent = Button
+    local BtnGradient = Instance.new("UIGradient")
+    BtnGradient.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(128, 0, 128)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 105, 180))
+    }
+    BtnGradient.Parent = Button
 
-    Btn.MouseButton1Click:Connect(function()
+    -- Green Dot and Status
+    local StatusFrame = Instance.new("Frame")
+    StatusFrame.Size = UDim2.new(1, 0, 0, 10)
+    StatusFrame.Position = UDim2.new(0, 0, 0, 40)
+    StatusFrame.BackgroundTransparency = 1
+    StatusFrame.Parent = ButtonFrame
+
+    local StatusDot = Instance.new("Frame")
+    StatusDot.Size = UDim2.new(0, 8, 0, 8)
+    StatusDot.Position = UDim2.new(0, 5, 0, 1)
+    StatusDot.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    StatusDot.Parent = StatusFrame
+    local DotCorner = Instance.new("UICorner")
+    DotCorner.CornerRadius = UDim.new(1, 0)
+    DotCorner.Parent = StatusDot
+
+    local StatusLabel = Instance.new("TextLabel")
+    StatusLabel.Size = UDim2.new(0, 100, 0, 10)
+    StatusLabel.Position = UDim2.new(0, 15, 0, 0)
+    StatusLabel.BackgroundTransparency = 1
+    StatusLabel.Text = "Undetected and Working"
+    StatusLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+    StatusLabel.TextSize = 12
+    StatusLabel.Font = Enum.Font.Gotham
+    StatusLabel.TextXAlignment = Enum.TextXAlignment.Left
+    StatusLabel.Parent = StatusFrame
+
+    Button.MouseButton1Click:Connect(function()
         local key = KeyInput.Text
         if key == "" or key == "Enter your key here" then
             game:GetService("StarterGui"):SetCore("SendNotification", {
-                Title = "Missing Key",
-                Text = "Enter a valid key first!",
+                Title = "Error",
+                Text = "Please enter a valid key",
                 Duration = 3
             })
             return
         end
-        local ok, err = pcall(function()
-            local data = game:HttpGet(info.url)
-            loadstring("script_key='" .. key .. "';" .. data)()
+        -- Execute script with enhanced error handling
+        local success, result = pcall(function()
+            local scriptContent = game:HttpGet(script.url, true)
+            if not scriptContent or scriptContent == "" then
+                error("Failed to fetch script content")
+            end
+            local scriptCode = string.format("script_key='%s';%s", key, scriptContent)
+            local func = loadstring(scriptCode)
+            if not func then
+                error("Failed to compile script")
+            end
+            return func()
         end)
-        game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = ok and "Loaded!" or "Error",
-            Text = ok and info.name .. " executed!" or tostring(err),
-            Duration = 3
-        })
+        if not success then
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Execution Error",
+                Text = "Failed to execute " .. script.name .. ": " .. tostring(result),
+                Duration = 5
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Success",
+                Text = script.name .. " executed successfully!",
+                Duration = 3
+            })
+        end
     end)
 end
 
--- Adjust scroll height
-Scroll.CanvasSize = UDim2.new(0, 0, 0, (#scripts * 50))
+-- Update CanvasSize based on number of scripts
+ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, #scripts * (buttonHeight + buttonSpacing))
 
--- Draggable Icon Toggle
-local ToggleIcon = Instance.new("ImageButton", ScreenGui)
-ToggleIcon.Size = UDim2.new(0, 65, 0, 65)
-ToggleIcon.Position = UDim2.new(0, 20, 0.8, 0)
-ToggleIcon.BackgroundColor3 = Color3.fromRGB(60, 0, 100)
-ToggleIcon.Image = "rbxassetid://7051121336"
-ToggleIcon.Active = true
-ToggleIcon.Draggable = true
+-- Minimize functionality
+local isMinimized = false
+local function toggleMinimize()
+    if isMinimized then
+        -- Restore GUI
+        MainFrame.Visible = true
+        local restoreTween = TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 300, 0, 400)})
+        restoreTween:Play()
+        if isMobile then
+            MinimizeButton.Text = "-"
+        end
+        isMinimized = false
+    else
+        -- Minimize GUI
+        local minimizeTween = TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {Size = UDim2.new(0, 40, 0, 40)})
+        minimizeTween:Play()
+        minimizeTween.Completed:Connect(function()
+            MainFrame.Visible = isMobile -- Keep visible on mobile for minimize button
+        end)
+        if isMobile then
+            MinimizeButton.Text = "+"
+        end
+        isMinimized = true
+    end
+end
 
-local IconCorner = Instance.new("UICorner", ToggleIcon)
-IconCorner.CornerRadius = UDim.new(1, 0)
-
--- Glow rotation
-local GlowGradient = Instance.new("UIGradient", ToggleIcon)
-GlowGradient.Color = ColorSequence.new(
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(160, 0, 255)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 100, 255))
-)
-RunService.RenderStepped:Connect(function()
-    GlowGradient.Rotation = GlowGradient.Rotation + 1
+-- Right Ctrl to minimize (PC)
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+    if not gameProcessedEvent and input.KeyCode == Enum.KeyCode.RightControl then
+        toggleMinimize()
+    end
 end)
 
--- Toggle visibility
-local menuVisible = true
-ToggleIcon.MouseButton1Click:Connect(function()
-    menuVisible = not menuVisible
-    MainFrame.Visible = menuVisible
+-- Minimize Button (Mobile)
+if isMobile then
+    MinimizeButton.MouseButton1Click:Connect(toggleMinimize)
+end
+
+-- Startup Animation
+local spinTween = TweenService:Create(StarImage, TweenInfo.new(2, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut, 0, false), {Rotation = 360})
+local stretchTween = TweenService:Create(StarImage, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut), {Size = UDim2.new(0, 200, 0, 200)})
+spinTween:Play()
+stretchTween:Play()
+stretchTween.Completed:Connect(function()
+    -- Fade out startup screen
+    local fadeTween = TweenService:Create(StartupFrame, TweenInfo.new(0.5, Enum.EasingStyle.Linear), {BackgroundTransparency = 1})
+    local imageFadeTween = TweenService:Create(StarImage, TweenInfo.new(0.5, Enum.EasingStyle.Linear), {ImageTransparency = 1})
+    fadeTween:Play()
+    imageFadeTween:Play()
+    imageFadeTween.Completed:Connect(function()
+        StartupFrame:Destroy()
+        -- Ensure MainFrame is visible and stretch it
+        MainFrame.Visible = true
+        local menuStretch = TweenService:Create(MainFrame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 300, 0, 400)})
+        menuStretch:Play()
+    end)
 end)
 
--- Placeholder behavior
+-- Clear placeholder text on focus
 KeyInput.Focused:Connect(function()
     if KeyInput.Text == "Enter your key here" then
         KeyInput.Text = ""
     end
 end)
+
+-- Reset placeholder text if empty
 KeyInput.FocusLost:Connect(function()
     if KeyInput.Text == "" then
         KeyInput.Text = "Enter your key here"
+    end
+end)
+
+-- Make GUI draggable
+local dragging
+local dragInput
+local dragStart
+local startPos
+
+MainFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        dragging = true
+        dragStart = input.Position
+        startPos = MainFrame.Position
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+MainFrame.InputChanged:Connect(function(input)
+    if (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) and dragging then
+        local delta = input.Position - dragStart
+        MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
     end
 end)
