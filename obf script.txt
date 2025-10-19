@@ -51,16 +51,16 @@ ScreenGui.Name = "PercsploitMultiLoader"
 ScreenGui.IgnoreGuiInset = true
 ScreenGui.ResetOnSpawn = false
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-ScreenGui.DisplayOrder = 1000 -- Ensure GUI renders on top
-ScreenGui.Parent = PlayerGui or game:GetService("CoreGui") -- Fallback to CoreGui if PlayerGui is unavailable
+ScreenGui.DisplayOrder = 1000
+ScreenGui.Parent = PlayerGui or game:GetService("CoreGui")
 
 -- Create Toggle Icon
 local ToggleIcon = Instance.new("ImageButton")
 ToggleIcon.Size = CONFIG.Sizes.IconSize
-ToggleIcon.Position = UDim2.new(0.95, -60, 0, 10) -- Adjusted to avoid clipping
+ToggleIcon.Position = UDim2.new(0.95, -60, 0, 10)
 ToggleIcon.BackgroundColor3 = CONFIG.Theme.Accent
 ToggleIcon.BackgroundTransparency = 0.5
-ToggleIcon.Image = "rbxassetid://10734949875" -- Reliable Roblox star icon
+ToggleIcon.Image = "rbxassetid://10734949875"
 ToggleIcon.ImageColor3 = CONFIG.Theme.Primary
 ToggleIcon.ZIndex = 10
 ToggleIcon.Parent = ScreenGui
@@ -69,7 +69,7 @@ local IconCorner = Instance.new("UICorner")
 IconCorner.CornerRadius = UDim.new(0, 10)
 IconCorner.Parent = ToggleIcon
 
-local IconLabel = Instance.new("TextLabel") -- Fallback label
+local IconLabel = Instance.new("TextLabel")
 IconLabel.Size = UDim2.new(1, 0, 1, 0)
 IconLabel.BackgroundTransparency = 1
 IconLabel.Text = "P"
@@ -146,6 +146,10 @@ local function executeScript(script, key)
         if not response or response == "" then
             error("Failed to fetch script content")
         end
+        -- Check if loadstring is available
+        if not loadstring then
+            error("loadstring is not supported in this environment")
+        end
         local scriptCode = string.format("script_key='%s';%s", key, response)
         local func = loadstring(scriptCode)
         if not func then
@@ -155,9 +159,13 @@ local function executeScript(script, key)
     end)
     if not success then
         showNotification("Execution Error", "Failed to execute " .. script.name .. ": " .. tostring(result))
-    else
-        showNotification("Success", script.name .. " executed successfully!", 3)
+        if string.find(tostring(result), "vulnerable function") then
+            showNotification("Debug Info", "Script may contain restricted functions (e.g., print). Contact script provider.", 10)
+        end
+        return false
     end
+    showNotification("Success", script.name .. " executed successfully!", 3)
+    return true
 end
 
 -- Create Script Buttons
@@ -318,8 +326,12 @@ local function initialize()
             error("PlayerGui not found, using CoreGui as fallback")
         end
         createScriptButtons()
-        ToggleIcon.Visible = true -- Explicitly ensure icon visibility
+        ToggleIcon.Visible = true
         showNotification("Initialized", "Percsploit Multi Loader initialized successfully! Click the top-right icon to toggle the menu.", 5)
+        -- Check if loadstring is supported
+        if not loadstring then
+            showNotification("Warning", "This environment does not support script execution. Try a different executor.", 10)
+        end
     end)
     if not success then
         showNotification("Initialization Error", "Failed to initialize: " .. tostring(result))
